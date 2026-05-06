@@ -1,0 +1,522 @@
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Нейронная Игра</title>
+        <link rel="manifest" type="text/json" href="/static/mainfest/manifest.webmanifest"/>
+        <meta property="og:image" content="/static/ico/icon.svg">
+        <link rel="apple-touch-icon" type="image/png" href="/static/ico/icon.svg">
+        <meta name="apple-mobile-web-app-title" content="Neural Radio">
+        <link rel="shortcut icon" type="image/x-icon" href="/static/ico/icon.svg">
+        <link rel="mask-icon" type="image/x-icon" href="/static/ico/icon.svg" color="#111">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <!-- Importing static CSS and JS files -->
+        <link rel="stylesheet" href="/static/css/game.css">
+    </head>
+    <body>
+        <div style="margin: 50px;">
+            <div>
+                <img class="m" id="mainImageChannelName" src="/static/game/assets/pixelMan.gif" />
+                <img class="m" id="logoSocial" src="/static/game/assets/logoTenchat.png"/>
+                <div class="floor"></div>
+                <img id="actionMsg" style="position: absolute;top: 60%;left: 55%;transform: translate(-50%, -50%);z-index: 2;max-width: 50vw;max-height: 25vh;" src="/static/game/assets/click.gif"/>
+            </div>
+            <div class="overlay"></div>
+            <div class="options">
+                <div class="options_sf">
+                    <img src="/static/game/assets/sfIcon.png" />
+                </div>
+                <div class="options_bg">
+                    <img src="/static/game/assets/bgIcon.png" />
+                </div>
+            </div>
+            <div class="name_modal">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <div class="intro_modal__header">
+                    <p data-eng="Hello">Привет</p>
+                    <img src="/static/game/assets/featuredHeader.png" />
+                </div>
+                <h3 data-eng="What is your name?">Кто вы?</h3>
+                <hr />
+                <input type="text" id="setNicknameChannelName" />
+                <div class="next" data-eng="Next">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    Продолжить
+                </div>
+            </div>
+            <div class="intro_modal">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <div class="intro_modal__header">
+                    <p data-eng="Hello">Привет</p>
+                    <img src="/static/game/assets/featuredHeader.png" />
+                </div>
+                <h3 data-eng="Welcome to the post writing simulator">Приветствую в симуляторе написания постов</h3>
+                <hr />
+                <p class="text" data-eng="Your goal is to see how many subscribers you can gain in 1 year!">Ваша цель — увидеть, сколько подписчиков вы сможете получить за 1 год!</p>
+                <p class="text" data-eng="Create posts, explore, and enhance your skills!">Создавайте посты, исследуйте и улучшайте свои навыки!</p>
+                <p class="text" data-eng="With each new post, its quality increases, helping you gain more views.">С каждым новым постом, увеличивается его качество, что поможет вам получить больше просмотров.</p>
+                <div class="go" data-eng="Start">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    Начнем?
+                </div>
+            </div>
+            <div class="endGame">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <div class="endGame__header">
+                    <p data-eng="Complete">Выполнено</p>
+                    <img src="/static/game/assets/featuredHeader.png" />
+                </div>
+                <h3 id="endGameChannelName"></h3>
+                <hr />
+                <h2 data-eng="You managed to achieve">Вам удалось получить</h2>
+                <h1 class="resultSubscribers">100000</h1>
+                <p data-eng="Subscribers">Подписчиков</p>
+                <p>
+                    <span data-eng="You released">Вы выпустили</span>
+                    <span class="pencount">1</span>
+                    <span data-eng="article(s)">статью(ей)</span>
+                </p>
+                <p>
+                    <span data-eng="Best user result">Лучший результат пользователя</span>
+                    <span class="mostName">x</span>
+                    <span data-eng="with">с</span>
+                    <span class="mostViews">x</span>
+                    <span data-eng="subscribers!">подписчиков!</span>
+                </p>
+                <a onclick="saveUserScore();">
+                    <div class="restart" data-eng="Save result!">
+                        <div class="pixelsTop"></div>
+                        <div class="pixelsBottom"></div>
+                        Сохранить результат!
+                    </div>
+                </a>
+            </div>
+            <div class="researchProgress">
+                <h2 data-eng="Learning a skill">Изучение навыка...</h2>
+                <div class="bar">
+                    <div class="bar_inner"></div>
+                </div>
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+            </div>
+            <div class="featured_modal">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <div class="featured_modal__header">
+                    <p data-eng="Favorite">Избранное</p>
+                    <img src="/static/game/assets/featuredHeader.png" />
+                </div>
+                <h3 data-eng="You've been chosen as the best author of the week!">Вас выбрали автором недели!</h3>
+                <hr />
+                <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;text-align: center;">
+                    <div class="featured_modal__image">
+                        <img src="/static/game/assets/cPreview.png" />
+                    </div>
+                    <div class="featured_modal__text">
+                        <span data-eng="Your article 'example'">твоя статья '<span class="name">пример</span>'</span>
+                        <span data-eng="received many reposts">получила много репостов</span>
+                        <span class="picker"></span>
+                        <span data-eng="this will increase your views!">это увеличит ваши просмотры!</span>
+                    </div>
+                </div>
+                <div class="awesome" data-eng="awesome">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    потрясающе
+                </div>
+            </div>
+            <div class="research_modal">
+                <div class="research_modal__header">
+                    <p data-eng="Skill board">Доска навыков</p>
+                    <img src="/static/game/assets/researchHeader.png" />
+                </div>
+                <h3 class="hide" data-eng="Improve your skills">Улучшить свои навыки</h3>
+                <hr class="hide" />
+                <div class="close hide">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    x
+                </div>
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <div class="research_modal__list hide"></div>
+            </div>
+            <div class="complete_modal">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <div class="complete_modal__header">
+                    <div class="image-container">
+                        <img src="/static/game/assets/penCompleteHeader.png">
+                        <span style="position: absolute;bottom: 20%;left: 50%;transform: translate(-50%, -50%);color: #c4ebfd;text-align: center;">
+                            <span data-eng="article completed">статья выполнена</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="hide">
+                    <img />
+                    <h2 data-eng="You've finished the article!">Вы закончили статью!</h2>
+                    <hr />
+                    <h3 data-eng="Let's check the results">давай посмотрим, на результаты</h3>
+                </div>
+                <div class="complete_modal__stats hide">
+                    <div class="html">
+                        <h4 data-eng="Grammar">Грамматика</h4>
+                        <img src="/static/game/assets/gHtml.png" /><span>
+                            <div class="swatch html"></div>
+                            <span>103</span>
+                        </span>
+                    </div>
+                    <div class="css">
+                        <h4 data-eng="Research">Исследованность</h4>
+                        <img src="/static/game/assets/gJS.png" /><span>
+                            <div class="swatch css"></div>
+                            <span>103</span>
+                        </span>
+                    </div>
+                    <div class="js">
+                        <h4 data-eng="Style">Стиль</h4>
+                        <img src="/static/game/assets/gCSS.png" /><span>
+                            <div class="swatch js"></div>
+                            <span>103</span>
+                        </span>
+                    </div>
+                    <div class="design">
+                        <h4 data-eng="Creativity">Креативность</h4>
+                        <img src="/static/game/assets/gDesign.png" /><span>
+                            <div class="swatch design"></div>
+                            <span>103</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="scrap hide">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <span data-eng="scrap article">отменить статью</span>
+                    <img class="icon" src="/static/game/assets/scrapCross.png" />
+                </div>
+                <div class="release hide">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <span data-eng="release article">выпустить статью</span>
+                    <img class="icon" src="/static/game/assets/releaseArrow.png" />
+                </div>                
+            </div>
+            <div class="pen">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <h2 data-eng="Progress">Прогресс:</h2>
+                <div class="date">
+                    <img src="/static/game/assets/gCalendar.png" /><span></span>
+                </div>
+                <div class="pen_bar">
+                    <div class="pen_bar_progress"></div>
+                </div>
+                <div class="pen_html">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <div class="swatch"></div>
+                    <span style="margin-left: 10pt;" data-eng="Grammar">Грамматика</span>
+                    <div class="sep"></div>
+                    <span class="val">0</span>
+                </div>
+                <div class="pen_css">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <div class="swatch"></div>
+                    <span style="margin-left: 10pt;" data-eng="Research">Исследованность</span>
+                    <div class="sep"></div>
+                    <span class="val">0</span>
+                </div>
+                <div class="pen_js">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <div class="swatch"></div>
+                    <span style="margin-left: 10pt;" data-eng="Style">Стиль</span>
+                    <div class="sep"></div>
+                    <span class="val">0</span>
+                </div>
+                <div class="pen_design">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <div class="swatch"></div>
+                    <span style="margin-left: 10pt;" data-eng="Creativity">Креативность</span>
+                    <div class="sep"></div>
+                    <span class="val">0</span>
+                </div>
+            </div>
+            <div class="releasedHeader" data-eng="Released articles">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <img class="icon" src="/static/game/assets/codepenIcon.png" />
+                Выпущенные статьи
+                <img class="arrow" src="/static/game/assets/downArrow.png" />
+            </div>
+            <div class="releasedEmpty">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <h2 data-eng="You haven't published an article yet">Вы еще не выпустили статью</h2>
+            </div>
+            <div class="released"></div>
+            <div class="username">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <img src="/static/game/assets/userIcon.png" />
+                <h2 data-eng="Developer">Разработчик</h2>
+            </div>
+            <div class="mystats">
+                <img src="/static/game/assets/skilsIcon.png" />
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <h2 data-eng="Skills">Навыки</h2>
+                <div class="mystats_html">
+                    <div class="swatch"></div>
+                    <span data-eng="Grammar:">Грамматика:</span>
+                    <span>lv</span>
+                    <span class="val">0</span>
+                </div>
+                <div class="mystats_css" >
+                    <div class="swatch"></div>
+                    <span data-eng="Research:">Исследованность:</span>
+                    <span>lv</span>
+                    <span class="val">0</span>
+                </div>
+                <div class="mystats_js">
+                    <div class="swatch"></div>
+                    <span data-eng="Style:">Стиль:</span>
+                    <span>lv</span>
+                    <span class="val">0</span>
+                </div>
+                <div class="mystats_design">
+                    <div class="swatch"></div>
+                    <span data-eng="Creativity:">Креативность:</span>
+                    <span>lv</span>
+                    <span class="val">0</span>
+                </div>
+            </div>
+            <div class="research"></div>
+            <div class="divResearchFollower">
+                <div class="researchButton" data-eng="Learn skills">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    Получить навыки
+                </div>
+                <div class="followers">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                    <text data-eng="Followers:">Подписчики:</text>
+                    <span>0</span>
+                </div>
+            </div>
+            <div class="achievementsButton" data-eng="Achievments">
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                Достижения
+                <img src="/static/game/assets/buttonArrow.png" />
+            </div>
+            <a id="linkToChannel" href="https://tenchat.ru/wladradchenko" target="_blank">
+                <div id="linkToChannelName" class="followButton">
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                </div>
+            </a>
+            <div class="startMashing">
+                <div class="auto off" data-eng="auto">
+                    авто
+                    <img class="cross" src="/static/game/assets/autoCross.png" /><img class="tick" src="/static/game/assets/autoTick.png" />
+                    <div class="pixelsTop"></div>
+                    <div class="pixelsBottom"></div>
+                </div>
+                <div class="pixelsTop"></div>
+                <div class="pixelsBottom"></div>
+                <h2>
+                    <span data-eng="Click on the screen to write an post">Кликай на экран, чтобы написать статью</span>
+                </h2>
+            </div>
+            <canvas class="grain"></canvas>
+        </div>
+        <script src="/static/js/game.js"></script>
+        <script>
+            function saveUserScore() {
+                const usernameDiv = document.getElementsByClassName('username')[0];
+                const nameElement = usernameDiv.querySelector('h2');
+                const name = nameElement.textContent;
+
+                // Get the user's score from a specific element on the page
+                const resultSubscribersDiv = document.getElementsByClassName('resultSubscribers')[0];
+                const score = parseInt(resultSubscribersDiv.textContent);
+
+                // Get the current date in YYYY-MM-DD format
+                const currentDate = new Date().toISOString().slice(0, 10);
+
+                // Retrieve existing local data or initialize an empty object
+                const existingData = JSON.parse(localStorage.getItem('userScores')) || {};
+
+                // Check if the user already exists in the stored data
+                if (existingData[name]) {
+                    // If the user exists, compare the scores and update if necessary
+                    if (existingData[name].score < score) {
+                        existingData[name] = {
+                            name_user: name,
+                            score: score
+                        };
+                    }
+                } else {
+                    // If the user doesn't exist, create a new entry
+                    existingData[name] = {
+                        name_user: name,
+                        score: score
+                    };
+                }
+
+                // Store the updated local data
+                localStorage.setItem('userScores', JSON.stringify(existingData));
+
+                // Reload the page or perform other actions as needed
+                location.reload(true);
+            }
+        </script>
+        <script>
+            // Use querySelector instead of getElementById, and ".startMashing" instead of "#startMashing"
+            document.querySelector('.startMashing').addEventListener('click', function() {
+                this.classList.add('clicked');
+
+                // Remove class after the animation is complete to return to original animation duration
+                setTimeout(() => {
+                    this.classList.remove('clicked');
+                }, 200);
+            });
+        </script>
+        <script>
+            // Function to get URL parameters
+            function getUrlParams() {
+                const searchParams = new URLSearchParams(window.location.search);
+                return Object.fromEntries(searchParams.entries());
+            }
+    
+            // Check for the language parameter in the URL
+            const urlParams = getUrlParams();
+            if (urlParams.lang && urlParams.lang === 'eng') {
+                // Translate to English
+                document.documentElement.lang = 'eng'; // Change document language to English
+    
+                // Replace Russian text with English
+                document.querySelectorAll('[data-eng]').forEach(element => {
+                    element.textContent = element.getAttribute('data-eng');
+                });
+            }
+        </script>
+        <script>
+            // Get a random number between 0 and 4 (inclusive)
+            const randomNumber = Math.floor(Math.random() * 6);
+
+            let channelName;
+
+            if (urlParams.social && urlParams.social === 'tenchat') {
+                channelName = 'TenChat';
+            } else if (urlParams.social && urlParams.social === 'habr') {
+                channelName = 'Habr';
+            } else if (urlParams.social && urlParams.social === 'github') {
+                channelName = 'GitHub';
+            } else if (urlParams.social && urlParams.social === 'youtube') {
+                channelName = 'YouTube';
+            } else if (urlParams.social && urlParams.social === 'telegram') {
+                channelName = 'Telegram';
+            } else if (urlParams.social && urlParams.social === 'dev') {
+                channelName = 'Dev';
+            } else {
+                // Based on the random number, select a channel randomly
+                switch (randomNumber) {
+                    case 0:
+                        channelName = 'TenChat';
+                        break;
+                    case 1:
+                        channelName = 'Habr';
+                        break;
+                    case 2:
+                        channelName = 'GitHub';
+                        break;
+                    case 3:
+                        channelName = 'YouTube';
+                        break;
+                    case 4:
+                        channelName = 'Telegram';
+                        break;
+                    default:
+                        channelName = 'Dev';
+                        break;
+                }
+            }
+
+            const translationsChannel = {
+                'eng': {
+                    'linkToChannelName': `Follow me on ${channelName}`,
+                    'endGameChannelName': `Congratulations! You have spent 1 year on ${channelName}!`,
+                    'setNicknameChannelName': `Input your name`
+                },
+                'rus': {
+                    'linkToChannelName': `Ищи меня в ${channelName}`,
+                    'endGameChannelName': `Поздравляем! Вы провели 1 год в ${channelName}!`,
+                    'setNicknameChannelName': `Введите ваше имя`
+                }
+            };
+
+            const langChannel = urlParams.lang === 'eng' ? 'eng' : 'rus';
+
+            if (channelName === 'TenChat') {
+                // Update the elements with specific content for 'tenchat'
+                document.getElementById("linkToChannel").href = "https://tenchat.ru/wladradchenko";
+                document.getElementById('linkToChannelName').innerText = translationsChannel[langChannel]['linkToChannelName'];
+                document.getElementById('endGameChannelName').innerText = translationsChannel[langChannel]['endGameChannelName'];
+                document.getElementById('setNicknameChannelName').placeholder = translationsChannel[langChannel]['setNicknameChannelName'];
+                document.getElementById("logoSocial").src = "/static/game/assets/logoTenchat.png";
+                $('.floor').css('border-top', '25px solid #f23441');
+            } else if (channelName === 'Habr') {
+                // Update the elements with specific content for 'habr'
+                document.getElementById("linkToChannel").href = "https://habr.com/ru/users/wladradchenko";
+                document.getElementById('linkToChannelName').innerText = translationsChannel[langChannel]['linkToChannelName'];
+                document.getElementById('endGameChannelName').innerText = translationsChannel[langChannel]['endGameChannelName'];
+                document.getElementById('setNicknameChannelName').placeholder = translationsChannel[langChannel]['setNicknameChannelName'];
+                document.getElementById("logoSocial").src = "/static/game/assets/logoHabr.png";
+                $('.floor').css('border-top', '25px solid #ffffff');
+            } else if (channelName === 'GitHub') {
+                // Update the elements with other content if the channel is not any
+                document.getElementById("linkToChannel").href = "https://github.com/wladradchenko";
+                document.getElementById('linkToChannelName').innerText = translationsChannel[langChannel]['linkToChannelName'];
+                document.getElementById('endGameChannelName').innerText = translationsChannel[langChannel]['endGameChannelName'];
+                document.getElementById('setNicknameChannelName').placeholder = translationsChannel[langChannel]['setNicknameChannelName'];
+                document.getElementById("logoSocial").src = "/static/game/assets/logoGithub.png";
+                $('.floor').css('border-top', '25px solid #ffffff');
+            } else if (channelName === 'YouTube') {
+                // Update the elements with other content if the channel is not any
+                document.getElementById("linkToChannel").href = "https://www.youtube.com/@wladradchenko";
+                document.getElementById('linkToChannelName').innerText = translationsChannel[langChannel]['linkToChannelName'];
+                document.getElementById('endGameChannelName').innerText = translationsChannel[langChannel]['endGameChannelName'];
+                document.getElementById('setNicknameChannelName').placeholder = translationsChannel[langChannel]['setNicknameChannelName'];
+                document.getElementById("logoSocial").src = "/static/game/assets/logoYoutube.png";
+                $('.floor').css('border-top', '25px solid #c73b45');
+            } else if (channelName === 'Telegram') {
+                // Update the elements with other content if the channel is not any
+                document.getElementById("linkToChannel").href = "https://t.me/wladblog";
+                document.getElementById('linkToChannelName').innerText = translationsChannel[langChannel]['linkToChannelName'];
+                document.getElementById('endGameChannelName').innerText = translationsChannel[langChannel]['endGameChannelName'];
+                document.getElementById('setNicknameChannelName').placeholder = translationsChannel[langChannel]['setNicknameChannelName'];
+                document.getElementById("logoSocial").src = "/static/game/assets/logoTelegram.png";
+                $('.floor').css('border-top', '25px solid #179ed6');
+            } else if (channelName === 'Dev') {
+                // Update the elements with other content if the channel is not any
+                document.getElementById("linkToChannel").href = "https://dev.to/wladradchenko";
+                document.getElementById('linkToChannelName').innerText = translationsChannel[langChannel]['linkToChannelName'];
+                document.getElementById('endGameChannelName').innerText = translationsChannel[langChannel]['endGameChannelName'];
+                document.getElementById('setNicknameChannelName').placeholder = translationsChannel[langChannel]['setNicknameChannelName'];
+                document.getElementById("logoSocial").src = "/static/game/assets/logoDev.png";
+                $('.floor').css('border-top', '25px solid #ffffff');
+            }
+        </script>
+    </body>
+</html>

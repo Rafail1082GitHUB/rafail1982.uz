@@ -2,6 +2,7 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/wladradchenko/radio.wladradchenko.ru?filename=web%2Fgo.mod)](https://github.com/wladradchenko/radio.wladradchenko.ru)
 [![GitHub package version](https://img.shields.io/github/v/release/wladradchenko/radio.wladradchenko.ru?display_name=tag&sort=semver)](https://github.com/wladradchenko/radio.wladradchenko.ru)
 [![License: MIT v1.0](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/wladradchenko/radio.wladradchenko.ru/blob/main/LICENSE)
+[![Podcast](https://img.shields.io/badge/neural-podcast-blue.svg)](https://neuralrussianman.mave.digital)
 
 <p align="right">(<a href="README.md">EN</a>)</p>
 <div id="top"></div>
@@ -25,10 +26,15 @@
   </p>
 </div>
 
+<br>
+<b>Статус</b>: АРХИВИРОВАНО. Проект больше не поддерживается (декабрь 2025 г.). Этот репозиторий является архивом моего любимого проекта «Нейронное радио». Проект останется доступным в виде кода, но я не планирую его дальнейшее развитие или поддержку. Причины: нишевый характер идеи, растущие потребности нейронных сетей в генерации музыки в ресурсах, а также отсутствие устойчивой, конкурентоспособной идеи для развития и роста. Я благодарю всех, кто проявил интерес к проекту, предоставил обратную связь, поддержал его пожертвованиями, подписался на канал, оставлял комментарии и даже заказал музыкальные треки. Если вы хотите запустить его локально, пожалуйста, найдите инструкции в `RUNLOCALLY.md`.
+
+<br>Вся музыка в проекте была сгенерирована с помощью нейронной сети на основе подсказок, и часть музыки доступна на [YouTube Playlist](https://www.youtube.com/playlist?list=PLJG0sD6007zFBhVunDaNQXzJ4LC3q4NTy).
+
 <!-- ABOUT THE PROJECT -->
 ## О проекте
 
-Бесконечное нейронное радио — этот проект веб-оболочка, которая позволяет пользователям слушать персонализированную коллекцию музыки lofi (которая создано нейронной сетью [Audiocraft](https://github.com/facebookresearch/audiocraft)), а также некоторые радиостанции и время от времени наслаждаться голосом радиоведущего на основе нейронной сети сгенерированного в приложении [Wunjo AI](https://github.com/wladradchenko/wunjo.wladradchenko.ru). 
+Бесконечное нейронное радио — этот проект веб-оболочка, которая позволяет пользователям слушать персонализированную коллекцию музыки lofi (которая создано нейронной сетью [Audiocraft](https://github.com/facebookresearch/audiocraft)), а также некоторые радиостанции и время от времени наслаждаться голосом радиоведущего на основе нейронной сети сгенерированного в приложении [Wunjo](https://github.com/wladradchenko/wunjo.wladradchenko.ru). 
 
 Цель проекта, создать нон-стоп музыкальные композиции и подкаст для комфортной работы, отдыха и вечернего времени.
 
@@ -52,6 +58,6 @@
 
 Почта: [i@wladradchenko.ru](i@wladradchenko.ru)
 
-Проект: [Бесконечное нейронное радио](https://radio.wladradchenko.ru)
+Проект: [Бесконечное нейронное радио](https://github.com/wladradchenko/radio.wladradchenko.ru)
 
 <p align="right">(<a href="#top">вернуться наверх</a>)</p>

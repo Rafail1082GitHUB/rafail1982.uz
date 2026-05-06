@@ -1,6 +1,9 @@
 [
-    {"url": "https://usa9.fastcast4u.com/proxy/jamz?mp=/1", "genre": "lofi", "name": "Lo-Fi"},
-    {"url": "https://ice55.securenetsystems.net/DASH25", "genre": "lofi", "name": "Lo-Fi"},
-    {"url": "https://boxradio-edge-08.streamafrica.net/lofi", "genre": "lofi", "name": "Lo-Fi"},
-    {"url": "https://stream-020.zeno.fm/0r0xa792kwzuv?zs=wFOyrB8mRJqJGCCVLLuFJw", "genre": "lofi", "name": "Lo-Fi"}
+    {"url": "/stream?station=lofi", "genre": "custom", "name": "Neural Lo-Fi", "source": "2d"},
+    {"url": "/stream?station=8bit", "genre": "custom", "name": "Neural 8bit", "source": "2d"},
+    {"url": "/stream?station=retro", "genre": "retro", "name": "Neural 80s", "source": "2d"},
+    {"url": "/stream?station=retro_vocals", "genre": "retro_vocals", "name": "Neural 80s", "source": "3d"},
+    {"url": "/stream?station=pop_vocals", "genre": "pop_vocals", "name": "Neural Pop", "source": "3d"},
+    {"url": "/stream?station=space", "genre": "space", "name": "Neural Space", "source": "2d"}
 ]
+

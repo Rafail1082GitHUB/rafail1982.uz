@@ -85,7 +85,12 @@
     transform: translateX(-5px);
   }
   
-  .buttons-wrapper.right:hover {
+  /* transform animation for next right */
+  /* .buttons-wrapper.right:hover {
+    transform: translateX(5px);
+  } */
+
+  .buttons-wrapper.mode:hover {
     transform: translateX(5px);
   }
   
@@ -372,7 +377,7 @@
   #list-settings.opened {
     max-height: 300px;
     transition: max-height 0.3s ease-in;
-    box-shadow: 2px 4px 0 #020406;
+    box-shadow: 2px 0px 0 #020406;
   }
 
   .settings-description {
@@ -380,7 +385,7 @@
     position: fixed;
     transform: translateX(-50%);
     right: 30px;
-    bottom: 65px;
+    bottom: 10vh;
   }
 
   .button-vol {

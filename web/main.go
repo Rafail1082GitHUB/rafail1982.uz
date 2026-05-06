@@ -5,6 +5,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"html/template"
@@ -14,7 +15,10 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"strconv"
+	"path/filepath"
+	"io"
+	"os"
+	"net"
 )
 
 type Radio struct {
@@ -23,62 +27,53 @@ type Radio struct {
 	Name  string `json:"name"`
 }
 
-type ServerMusic struct {
-	URL      string `json:"url"`
-	Genre    string `json:"genre"`
-	MaxRand  int    `json:"max_rand"`
-	NumIter  int    `json:"num_iter"`
+type Podcast struct {
+	Url      string `json:"url"`
+	Lang string `json:"lang"`
 }
 
 func main() {
 	fmt.Println("Program starting... Waiting a minute while the code checks radio points.")
+	http.HandleFunc("/simulator_game", gameHandler)
+	http.HandleFunc("/stream", streamHandler)  // Register the new stream handler
+	http.HandleFunc("/podcast", podcastHandler)  // Register the new podcast handler
 
 	host := flag.String("host", "127.0.0.1", "host to listen on")
 	port := flag.Int("port", 8080, "port to listen on")  // add another port
 	flag.Parse()
 
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var wg sync.WaitGroup
-	c := make(chan ServerMusic)
 
-	serverMusicFile := "./static/radio/custom.json"
-	serverMusicList, err := readCustomMusicFromFile(serverMusicFile)
+	podcastFile := "./static/radio/podcast.json"
+	podcasts, err := readPodcastFromFile(podcastFile)
 	if err != nil {
 		log.Fatalf("Error reading radios from file: %s", err)
 	}
 
-	for _, music := range serverMusicList {
-		for i := 0; i < music.NumIter; i++ {
-			randInt := rand.Intn(music.MaxRand) + 1
-			urlMusic := music.URL + strconv.Itoa(randInt) + ".mp3"
-
-			wg.Add(1)
-			go checkMusicFile(urlMusic, &wg, c, music.Genre)
-		}
+	podcastChan := make(chan Podcast)
+	for _, podcast := range podcasts {
+		wg.Add(1)
+		go checkPodcast(podcast, &wg, podcastChan)
 	}
 
 	go func() {
 		wg.Wait()
-		close(c)
+		close(podcastChan)
 	}()
 
-	genreMap := make(map[string][]string)
 	numVoice := make(map[string][]string)
 
-	for music := range c {
-		if music.Genre == "custom" {
-			genreMap["custom"] = append(genreMap["custom"], music.URL)
-		} else {
-			numVoice[music.Genre] = append(numVoice[music.Genre], music.URL)
-		}
+	var validPodcasts []Podcast
+	for podcast := range podcastChan {
+		validPodcasts = append(validPodcasts, podcast)
+		numVoice[podcast.Lang] = append(numVoice[podcast.Lang], podcast.Url)
 	}
 
-	fmt.Printf("Files today: %d\n", len(genreMap["custom"]))
+	fmt.Printf("Podcasts found: %d\n", len(validPodcasts))
 
-	for key, val := range numVoice {
-		fmt.Printf("Key: %s, Num Values: %d\n", key, len(val))
-	}
+	genreMap := make(map[string][]string)
 
 	radioFile := "./static/radio/radio.json"
 	radios, err := readRadiosFromFile(radioFile)
@@ -129,46 +124,31 @@ func readRadiosFromFile(file string) ([]Radio, error) {
 	return radios, nil
 }
 
-func readCustomMusicFromFile(file string) ([]ServerMusic, error) {
+func readPodcastFromFile(file string) ([]Podcast, error) {
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	var serverMusic []ServerMusic
-	if err = json.Unmarshal(data, &serverMusic); err != nil {
+	var podcasts []Podcast
+	if err = json.Unmarshal(data, &podcasts); err != nil {
 		return nil, err
 	}
 
-	return serverMusic, nil
+	return podcasts, nil
 }
 
 func checkRadio(radio Radio, wg *sync.WaitGroup, radioChan chan<- Radio) {
 	defer wg.Done()
-	resp, err := http.Get(radio.Url)
-	if err != nil {
-		log.Printf("Error checking radio %s: %s", radio.Url, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.Header.Get("Content-Type") == "audio/mpeg" {
-		radioChan <- radio
+	if len(radio.Url) > 0 && radio.Url[:7] == "/stream" {
+			radioChan <- radio
 	}
 }
 
-func checkMusicFile(url string, wg *sync.WaitGroup, c chan<- ServerMusic, genre string) {
+func checkPodcast(podcast Podcast, wg *sync.WaitGroup, podcastChan chan<- Podcast) {
 	defer wg.Done()
-
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.Header.Get("Content-Type") == "audio/mpeg" {
-		c <- ServerMusic{URL: url, Genre: genre}
+	if len(podcast.Url) > 0 && podcast.Url[:8] == "/podcast" {
+		podcastChan <- podcast
 	}
 }
 
@@ -252,4 +232,140 @@ func handleEvents(genres map[string][]string, numVoice map[string][]string) func
             sendData() // Then send data every 30 seconds
         }
     }
+}
+
+// Game
+func gameHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	// Implement rendering of "simulator_post.html" template here
+	// You'll need to handle rendering HTML templates using Go's HTML/template package
+	// For example:
+	tmpl, err := template.ParseFiles("static/html/game.html")
+	if err != nil {
+	   http.Error(w, err.Error(), http.StatusInternalServerError)
+	   return
+	}
+	tmpl.Execute(w, nil) // Pass any required data to the template
+}
+
+
+func streamHandler(w http.ResponseWriter, r *http.Request) {
+	station := r.URL.Query().Get("station")
+	if station == "" {
+			http.Error(w, "No station.", http.StatusBadRequest)
+			return
+	}
+
+	audioPath := "static/music/"
+	stationPath := filepath.Join(audioPath, station)
+
+	if _, err := os.Stat(stationPath); os.IsNotExist(err) {
+			http.Error(w, "No station.", http.StatusNotFound)
+			return
+	}
+
+	stationFiles, err := filepath.Glob(filepath.Join(stationPath, "*.mp3"))
+	if err != nil || len(stationFiles) == 0 {
+			http.Error(w, "No audio files found.", http.StatusNotFound)
+			return
+	}
+
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+	rand.Shuffle(len(stationFiles), func(i, j int) { stationFiles[i], stationFiles[j] = stationFiles[j], stationFiles[i] })
+
+	w.Header().Set("Content-Type", "audio/mpeg")
+
+	ctx := r.Context()
+
+	for {
+			for _, file := range stationFiles {
+					select {
+					case <-ctx.Done():
+							log.Println("Client closed the connection")
+							return
+					default:
+							audioFile, err := os.Open(file)
+							if err != nil {
+									log.Printf("Error opening file: %s", err)
+									continue
+							}
+
+							_, err = io.Copy(w, audioFile)
+							audioFile.Close()
+
+							if err != nil {
+									if isClientDisconnectError(err) {
+											log.Println("Client closed the connection")
+											return
+									} else {
+											log.Printf("Error streaming file: %s", err)
+											return
+									}
+							}
+
+							time.Sleep(500 * time.Millisecond)
+					}
+			}
+			rand.Shuffle(len(stationFiles), func(i, j int) { stationFiles[i], stationFiles[j] = stationFiles[j], stationFiles[i] })
+	}
+}
+
+func isClientDisconnectError(err error) bool {
+	if opErr, ok := err.(*net.OpError); ok && (opErr.Err.Error() == "write: broken pipe" || opErr.Err.Error() == "write: connection reset by peer") {
+			return true
+	}
+	return false
+}
+
+type Enclosure struct {
+	URL string `xml:"url,attr"`
+}
+
+type Item struct {
+	Enclosures []Enclosure `xml:"enclosure"`
+}
+
+type RSS struct {
+	Channel struct {
+			Items []Item `xml:"item"`
+	} `xml:"channel"`
+}
+
+func podcastHandler(w http.ResponseWriter, r *http.Request) {
+	rssFeedURL := r.URL.Query().Get("rss_feed_url")
+	if rssFeedURL == "" {
+			http.Error(w, "No podcast links found in the provided RSS feed URL.", http.StatusBadRequest)
+			return
+	}
+
+	resp, err := http.Get(rssFeedURL)
+	if err != nil {
+			http.Error(w, "Error fetching RSS feed.", http.StatusInternalServerError)
+			return
+	}
+	defer resp.Body.Close()
+
+	var rss RSS
+	if err := xml.NewDecoder(resp.Body).Decode(&rss); err != nil {
+			http.Error(w, "Error parsing RSS feed.", http.StatusInternalServerError)
+			return
+	}
+
+	var podcastLinks []string
+	for _, item := range rss.Channel.Items {
+			for _, enclosure := range item.Enclosures {
+					podcastLinks = append(podcastLinks, enclosure.URL)
+			}
+	}
+
+	if len(podcastLinks) == 0 {
+			http.Error(w, "No podcast links found in the RSS feed.", http.StatusNotFound)
+			return
+	}
+
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+	http.Redirect(w, r, podcastLinks[rand.Intn(len(podcastLinks))], http.StatusFound)
 }
